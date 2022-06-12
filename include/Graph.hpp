@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "Node.hpp"
+#include "Edge.hpp"
 
 class Graph {
     private:
@@ -13,6 +14,7 @@ class Graph {
         size_t lowerBound;
         size_t upperBound;
         std::vector<Node> nodeVector;
+        std::vector<Edge> edgeVector;
     public:
         Graph(size_t nNodes, size_t nEdge, size_t nClusters, size_t lBound, size_t uBound);
         void insertNode(int id, float weight);
