@@ -14,7 +14,7 @@ class Graph {
         size_t upperBound;
         std::vector<Node> nodeVector;
     public:
-        Graph(size_t nNodes, size_t nEdge);
+        Graph(size_t nNodes, size_t nEdge, size_t nClusters, size_t lBound, size_t uBound);
         void insertNode(int id, float weight);
         void insertEdge(int idNode1, int idNode2, float weight);
 };
