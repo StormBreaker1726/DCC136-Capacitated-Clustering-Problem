@@ -16,9 +16,10 @@ class Graph {
         std::vector<Node> nodeVector;
         std::vector<Edge> edgeVector;
     public:
-        Graph(size_t nNodes, size_t nEdge, size_t nClusters, size_t lBound, size_t uBound);
+        Graph(size_t nNodes, size_t nClusters, size_t lBound, size_t uBound);
         void insertNode(int id, float weight);
         void insertEdge(int idNode1, int idNode2, float weight);
+        void setNEdges(size_t nEdge);
 };
 
 #endif // GRAPH_HPP
