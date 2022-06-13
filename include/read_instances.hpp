@@ -1,10 +1,6 @@
 #ifndef FBCBAACF_3699_4CDA_9FC8_E1FFED46D735
 #define FBCBAACF_3699_4CDA_9FC8_E1FFED46D735
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <memory.h>
 #include "Graph.hpp"
 
 // void read_handover(std::shared_ptr<Graph> graph_to_operate, std::ifstream& instance_file)

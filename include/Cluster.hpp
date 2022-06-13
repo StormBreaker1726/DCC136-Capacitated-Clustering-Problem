@@ -1,15 +1,12 @@
 #ifndef A97DC2E7_94AA_4207_9667_07BC5C5517E9
 #define A97DC2E7_94AA_4207_9667_07BC5C5517E9
 
-#include <iostream>
-#include <cmath>
-#include <fstream>
-#include <vector>
-#include <deque>
 #include "Node.hpp"
 
 /*                              id_source, id_target                 */
 using edge_t = std::vector<std::pair<int, int>>;
+using edge_ptr = std::shared_ptr<Edge>;
+using node_ptr = std::shared_ptr<Node>;
 
 struct Cluster
 {
@@ -19,9 +16,9 @@ struct Cluster
     size_t lower_bound;
 
     double cluster_cost = 0; /* custo das arestas armazenadas */
-    float current_bound = 0; /* custo dos nós ali armazenados */
+    double current_bound = 0; /* custo dos nós ali armazenados */
 
-    bool insertEdge(Node* s_node, Node* t_node, Edge* edge)
+    bool insertEdge(node_ptr s_node, node_ptr t_node, edge_ptr edge)
     {
         if(current_bound + s_node->weight() + t_node->weight() <= upper_bound)
         {
