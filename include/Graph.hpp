@@ -20,6 +20,7 @@ class Graph {
         void insertNode(int id, float weight);
         void insertEdge(int idNode1, int idNode2, float weight);
         void setNEdges(size_t nEdge);
+        Edge* getEdge(int s_id, int t_id);
 };
 
 #endif // GRAPH_HPP

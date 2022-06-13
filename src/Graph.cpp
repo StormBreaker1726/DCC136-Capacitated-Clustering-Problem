@@ -25,3 +25,16 @@ void Graph::setNEdges(size_t nEdge)
     this->nEdges = nEdge;
     this->edgeVector.reserve(nEdge);
 }
+
+Edge* Graph::getEdge(int s_id, int t_id) {
+    for (size_t i=0; i<this->edgeVector.size(); ++i) {
+        std::unique_ptr<Edge> e(&this->edgeVector.at(i));
+        if (e->idNode1() == s_id && e->idNode2() == t_id) {
+            return &this->edgeVector.at(i);
+        }
+        if (e->idNode1() == t_id && e->idNode2() == s_id) {
+            return &this->edgeVector.at(i);
+        }
+    }
+    return nullptr;
+}
