@@ -80,15 +80,17 @@ std::shared_ptr<Graph> read_ran_and_sparse(std::ifstream& instance_file)
         instance_file >> node_weight;
         graph_to_operate->insertNode(i, node_weight);
     }
-
+    int number_of_edges = 0;
     while (!instance_file.eof())
     {
         instance_file >> source_id;
         instance_file >> target_id;
         instance_file >> node_weight;
-
+        number_of_edges++;
         graph_to_operate->insertEdge(source_id, target_id, node_weight);
     }
+
+    graph_to_operate->setNEdges(number_of_edges);
 
     return graph_to_operate;
 }
