@@ -23,4 +23,5 @@ void Graph::insertEdge(int id1, int id2, float weight) {
 void Graph::setNEdges(size_t nEdge)
 {
     this->nEdges = nEdge;
+    this->edgeVector.reserve(nEdge);
 }
