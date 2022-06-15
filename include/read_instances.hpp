@@ -3,40 +3,57 @@
 
 #include "Graph.hpp"
 
-// void read_handover(std::shared_ptr<Graph> graph_to_operate, std::ifstream& instance_file)
-// {
-//     size_t number_of_nodes;
-//     size_t number_of_clusters;
-//     double cluster_capacity;
+std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
+{
+    size_t number_of_nodes;
+    size_t number_of_clusters;
+    double lower_bounds;
+    double upper_bounds;
 
-//     float node_weight;
+    std::string garbage;
 
-//     size_t i = 0;
-//     int id = 0;
-//     while (!instance_file.eof())
-//     {
-//         if(i == 0)
-//         {
-//             instance_file >> number_of_nodes;
-//         }
-//         else if(i == 1)
-//         {
-//             instance_file >> number_of_clusters;
-//         }
-//         else if(i == 2)
-//         {
-//             instance_file >> cluster_capacity;
-//         }
-//         else
-//         {
-//             instance_file >> node_weight;
-//             graph_to_operate->insertNode(id, node_weight);
-//         }
-//         id++;
-//         i++;
-//     }
+    int target_id;
+    int source_id;
+    float node_weight;
 
-// }
+    int edge_weight; 
+
+    std::vector<std::vector<int>> adjacency_matrix;
+
+    instance_file >> number_of_nodes;
+    instance_file >> number_of_clusters;
+    instance_file >> upper_bounds;
+    instance_file >> lower_bounds;
+
+    std::shared_ptr<Graph> graph_to_operate(new Graph(number_of_nodes, number_of_clusters, lower_bounds, upper_bounds));
+
+    for (size_t i = 0; i < number_of_nodes; i++)
+    {
+        instance_file >> node_weight;
+        graph_to_operate->insertNode(i, node_weight);
+    }
+
+    for (size_t i = 0; i < number_of_nodes; i++)
+    {
+        std::vector<int> temp;
+        for (size_t j = 0; j < number_of_nodes; j++)
+        {
+            instance_file >> edge_weight;
+            temp.push_back(edge_weight);
+        }
+        adjacency_matrix.push_back(temp);
+    }
+
+    for (size_t i = 0; i < number_of_nodes; i++)
+    {
+        for (size_t j = 0; j < number_of_nodes; j++)
+        {
+            graph_to_operate->insertEdge(i, j, adjacency_matrix.at(i).at(j));
+        }
+    }
+
+    return graph_to_operate;
+}
 
 std::shared_ptr<Graph> read_ran_and_sparse(std::ifstream& instance_file)
 {
