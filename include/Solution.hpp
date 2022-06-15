@@ -21,6 +21,12 @@ struct Solution
             solution_cost += clusters.at(i)->cluster_cost;
         }
     };
+
+    void insert_edge_on_cluster(size_t cluster_id, node_ptr n1, node_ptr n2, edge_ptr edge)
+    {
+        this->clusters.at(cluster_id)->insertEdge(n1, n2, edge);
+        this->update_cost();
+    };
 };
 
 

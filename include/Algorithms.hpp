@@ -15,7 +15,8 @@ class Algorithms
                 Um candidato é dado por uma Aresta, que será inserida
                 num cluster, dado pelo cluster_id.
             */
-            std::shared_ptr<Edge> e;
+            int s_id;
+            int t_id;
             double w_n1;
             double w_n2;
             size_t cluster_id;
@@ -45,13 +46,14 @@ class Algorithms
             */
             double insertion_chance;
              
-            Candidate_Edge(edge_ptr e, size_t cluster_id, double w_n1, double w_n2) {
-                this->e = e;
+            Candidate_Edge(int s_id, int t_id, size_t cluster_id, double w_n1, double w_n2, double insertion_chance) {
+                this->s_id = s_id;
+                this->t_id = t_id;
                 this->w_n1 = w_n1;
                 this->w_n2 = w_n2;
                 this->cluster_id = cluster_id;
                 this->viable = true;
-                this->insertion_chance;
+                this->insertion_chance = insertion_chance;
             };
         };
 
@@ -59,6 +61,7 @@ class Algorithms
         double penalization(node_ptr n1, node_ptr n2, size_t cluster_id);
         double chance_calc(edge_ptr e, size_t cluster_id);
         sol_ptr greedyHelper(float alpha, size_t iteration);
+        //std::vector<Candidate_Edge> update_cand_list(std::vector<Candidate_Edge>& cand_list);
     public:
         Algorithms(std::shared_ptr<Graph> g);
         sol_ptr greedy();

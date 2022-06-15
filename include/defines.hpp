@@ -1,13 +1,14 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
-#include <iostream>
+#include <algorithm>
 #include <cmath>
-#include <fstream>
-#include <vector>
 #include <deque>
+#include <fstream>
 #include <iomanip>
-#include <memory>
+#include <iostream>
 #include <list>
+#include <memory>
+#include <vector>
 
 #endif // DEFINES_HPP

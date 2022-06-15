@@ -26,6 +26,26 @@ void Graph::setNEdges(size_t nEdge)
     this->edgeVector.reserve(nEdge);
 }
 
+size_t Graph::getNumberNodes() {
+    return this->nNodes;
+}
+
+size_t Graph::getNumberEdges() {
+    return this->nEdges;
+}
+
+size_t Graph::getNumberClusters() {
+    return this->nClusters;
+}
+
+std::vector<std::shared_ptr<Node>> Graph::getNodeVector() {
+    return this->nodeVector;
+}
+
+std::vector<edge_ptr> Graph::getEdgeVector() {
+    return this->edgeVector;
+}
+
 std::shared_ptr<Edge> Graph::getEdge(int s_id, int t_id) {
     for (size_t i=0; i<this->edgeVector.size(); ++i) {
         std::shared_ptr<Edge> e(this->edgeVector.at(i));
