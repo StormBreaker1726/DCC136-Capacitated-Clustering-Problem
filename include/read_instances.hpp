@@ -48,7 +48,10 @@ std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
     {
         for (size_t j = 0; j < number_of_nodes; j++)
         {
-            graph_to_operate->insertEdge(i, j, adjacency_matrix.at(i).at(j));
+            if(adjacency_matrix.at(i).at(j) != 0)
+            {
+                graph_to_operate->insertEdge(i, j, adjacency_matrix.at(i).at(j));
+            }
         }
     }
 
