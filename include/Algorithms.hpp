@@ -60,7 +60,7 @@ class Algorithms
         sol_ptr solution;
         double penalization(node_ptr n1, node_ptr n2, size_t cluster_id);
         double chance_calc(edge_ptr e, size_t cluster_id);
-        sol_ptr greedyHelper(float alpha, size_t iteration);
+        sol_ptr greedyHelper(float alpha);
         //std::vector<Candidate_Edge> update_cand_list(std::vector<Candidate_Edge>& cand_list);
     public:
         Algorithms(std::shared_ptr<Graph> g);

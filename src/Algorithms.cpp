@@ -22,7 +22,7 @@ double Algorithms::chance_calc(edge_ptr e, size_t cluster_id) {
 
 
 
-sol_ptr Algorithms::greedyHelper(float alpha, size_t iterations) {
+sol_ptr Algorithms::greedyHelper(float alpha) {
     sol_ptr s(new Solution());
 
     std::vector<Candidate_Edge> cand_list;
@@ -79,5 +79,9 @@ sol_ptr Algorithms::greedyHelper(float alpha, size_t iterations) {
             }
         }
     }
+    return s;
+}
 
+sol_ptr Algorithms::greedy() {
+    return this->greedyHelper(0);
 }
