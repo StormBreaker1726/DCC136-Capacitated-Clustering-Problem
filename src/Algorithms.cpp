@@ -59,6 +59,25 @@ sol_ptr Algorithms::greedyHelper(float alpha, size_t iterations) {
             this->g->getEdge(c.s_id, c.t_id));
         
         /* Refazer a lista de candidatos */
+        /* retirar a aresta inserida na solução */
+        size_t cluster = c.cluster_id;
+        cand_list.erase(cand_list.begin() + cand_n);
+        for (size_t i=0; i<cand_list.size(); ++i) {
+            /* retirar aresta dos outros clusters */
+            if (cand_list.at(i).s_id == c.s_id && cand_list.at(i).t_id == c.t_id) {
+                cand_list.erase(cand_list.begin() + i);
+                --i;
+            }
+            /* todas as arestas que estão ligadas ao cluster inserido
+            devem ser mantidos; aqueles que correspondem a um cluster 
+            diferente serão retirados */
+            else if (cand_list.at(i).s_id == c.s_id || cand_list.at(i).t_id == c.t_id) {
+                if (cand_list.at(i).cluster_id != cluster) {
+                    cand_list.erase(cand_list.begin() + i);
+                    --i;
+                }
+            }
+        }
     }
 
 }
