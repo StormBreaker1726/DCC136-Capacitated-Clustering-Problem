@@ -51,6 +51,20 @@ struct Solution
         }
         return min_id;
     }
+
+    void print_solution()
+    {
+        std::ofstream result("resultado.txt");
+        for (size_t i = 0; i < this->clusters.size(); i++)
+        {
+            result<<"Cluster "<<i<<":"<<std::endl;
+            for (size_t j = 0; j < this->clusters.at(i)->id_nodes.size(); j++)
+            {
+                result<<"\tAresta de "<<this->clusters.at(i)->id_nodes.at(j).first<<" para "<<this->clusters.at(i)->id_nodes.at(j).second<<" "<<std::endl;
+            }
+            result<<"\tCusto = "<<this->clusters.at(i)->cluster_cost<<"\n";
+        }
+    }
 };
 
 
