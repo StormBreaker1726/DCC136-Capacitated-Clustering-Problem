@@ -31,10 +31,13 @@ struct Solution
         }
     };
 
-    void insert_edge_on_cluster(size_t cluster_id, node_ptr n1, node_ptr n2, edge_ptr edge)
+    bool insert_edge_on_cluster(size_t cluster_id, node_ptr n1, node_ptr n2, edge_ptr edge)
     {
-        this->clusters.at(cluster_id)->insertEdge(n1, n2, edge);
-        this->update_cost();
+        if (this->clusters.at(cluster_id)->insertEdge(n1, n2, edge)) {
+            this->update_cost();
+            return true;
+        }
+        return false;
     };
 
     void insert_node_on_cluster(size_t cluster_id, node_ptr n) {

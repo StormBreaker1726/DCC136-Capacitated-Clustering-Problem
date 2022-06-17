@@ -26,7 +26,7 @@ struct Cluster
         this->current_bound = 0;
     }
 
-    void insertEdge(node_ptr s_node, node_ptr t_node, edge_ptr edge)
+    bool insertEdge(node_ptr s_node, node_ptr t_node, edge_ptr edge)
     {
         double bound = s_node->weight() + t_node->weight();
         for (size_t i=0; i<this->id_nodes.size(); ++i) {
@@ -55,8 +55,9 @@ struct Cluster
 
             this->current_bound += bound;
 
-            return;
+            return true;
         }
+        return false;
     };
 
     void insertNode(node_ptr n)
