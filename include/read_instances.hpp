@@ -54,7 +54,7 @@ std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
             }
         }
     }
-
+    std::cout<<"Leu td"<<std::endl;
     return graph_to_operate;
 }
 
@@ -107,7 +107,7 @@ std::shared_ptr<Graph> read_ran_and_sparse(std::ifstream& instance_file)
     }
 
     graph_to_operate->setNEdges(number_of_edges);
-
+    std::cout<<"Leu td"<<std::endl;
     return graph_to_operate;
 }
 

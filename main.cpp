@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
     std::ifstream inputFile;
     OPEN_FILE(inputFile, argv[1]);
 
-    std::shared_ptr<Algorithms> a(new Algorithms(read_handover(inputFile)));
+    std::shared_ptr<Algorithms> a(new Algorithms(read_ran_and_sparse(inputFile)));
     std::shared_ptr<Solution> s(a->greedy());
     s->print_solution();
     std::cout << "\nQualidade: " << s->solution_cost << "\n";
