@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
 
     std::shared_ptr<Algorithms> a(new Algorithms(read_handover(inputFile)));
     std::shared_ptr<Solution> s(a->greedy());
-
+    s->print_solution();
     std::cout << "\nQualidade: " << s->solution_cost << "\n";
 
     return 0;
