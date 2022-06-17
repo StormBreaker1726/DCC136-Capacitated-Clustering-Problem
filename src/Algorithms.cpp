@@ -61,40 +61,45 @@ sol_ptr Algorithms::greedyHelper(float alpha) {
         size_t cand_n = nElmts == 0 ? 0 : rand() % nElmts;
         Candidate_Edge c = cand_list.at(cand_n);
 
-        for (size_t i=0; i<nodes.size(); ++i) {
-            if (nodes.at(i)->id() == c.s_id || nodes.at(i)->id() == c.t_id) {
-                nodes.erase(nodes.begin() + i);
-                --i;
-            }
-        }
-        this->solution->insert_edge_on_cluster(c.cluster_id,
+        /* Se o cliente foi inserido, faz todas as atualizações 
+        se não, retira da lista de candidatos */
+        if (this->solution->insert_edge_on_cluster(c.cluster_id,
             this->g->getNode(c.s_id),
             this->g->getNode(c.t_id),
-            this->g->getEdge(c.s_id, c.t_id));
-        
-        /* Refazer a lista de candidatos */
-        /* retirar a aresta inserida na solução */
-        size_t cluster = c.cluster_id;
-        cand_list.erase(cand_list.begin() + cand_n);
-        for (size_t i=0; i<cand_list.size(); ++i) {
-            /* recalcular a chance de inserção de cada aresta */
-            cand_list.at(i).insertion_chance = this->chance_calc(
-                this->g->getEdge(cand_list.at(i).s_id, cand_list.at(i).t_id),
-                cand_list.at(i).cluster_id);
-            /* retirar aresta dos outros clusters */
-            if (cand_list.at(i).s_id == c.s_id && cand_list.at(i).t_id == c.t_id) {
-                cand_list.erase(cand_list.begin() + i);
-                --i;
-            }
-            /* todas as arestas que estão ligadas ao cluster inserido
-            devem ser mantidos; aqueles que correspondem a um cluster 
-            diferente serão retirados */
-            else if (cand_list.at(i).s_id == c.s_id || cand_list.at(i).t_id == c.t_id) {
-                if (cand_list.at(i).cluster_id != cluster) {
-                    cand_list.erase(cand_list.begin() + i);
+            this->g->getEdge(c.s_id, c.t_id))) 
+        {
+            for (size_t i=0; i<nodes.size(); ++i) {
+                if (nodes.at(i)->id() == c.s_id || nodes.at(i)->id() == c.t_id) {
+                    nodes.erase(nodes.begin() + i);
                     --i;
                 }
             }
+            /* Refazer a lista de candidatos */
+            /* retirar a aresta inserida na solução */
+            size_t cluster = c.cluster_id;
+            cand_list.erase(cand_list.begin() + cand_n);
+            for (size_t i=0; i<cand_list.size(); ++i) {
+                /* recalcular a chance de inserção de cada aresta */
+                cand_list.at(i).insertion_chance = this->chance_calc(
+                    this->g->getEdge(cand_list.at(i).s_id, cand_list.at(i).t_id),
+                    cand_list.at(i).cluster_id);
+                /* retirar aresta dos outros clusters */
+                if (cand_list.at(i).s_id == c.s_id && cand_list.at(i).t_id == c.t_id) {
+                    cand_list.erase(cand_list.begin() + i);
+                    --i;
+                }
+                /* todas as arestas que estão ligadas ao cluster inserido
+                devem ser mantidos; aqueles que correspondem a um cluster 
+                diferente serão retirados */
+                else if (cand_list.at(i).s_id == c.s_id || cand_list.at(i).t_id == c.t_id) {
+                    if (cand_list.at(i).cluster_id != cluster) {
+                        cand_list.erase(cand_list.begin() + i);
+                        --i;
+                    }
+                }
+            }
+        } else {
+            cand_list.erase(cand_list.begin() + cand_n);
         }
     }
     /* adicionar os nós que faltam nos clusters */
