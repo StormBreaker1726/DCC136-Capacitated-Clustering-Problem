@@ -7,13 +7,13 @@ std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
 {
     size_t number_of_nodes;
     size_t number_of_clusters;
-    double lower_bounds;
+    double lower_bounds = 0;
     double upper_bounds;
 
     std::string garbage;
 
-    int target_id;
-    int source_id;
+    //int target_id;
+    //int source_id;
     float node_weight;
 
     int edge_weight; 
@@ -23,7 +23,7 @@ std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
     instance_file >> number_of_nodes;
     instance_file >> number_of_clusters;
     instance_file >> upper_bounds;
-    instance_file >> lower_bounds;
+    //instance_file >> lower_bounds;
 
     std::shared_ptr<Graph> graph_to_operate(new Graph(number_of_nodes, number_of_clusters, lower_bounds, upper_bounds));
 
@@ -46,7 +46,7 @@ std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
 
     for (size_t i = 0; i < number_of_nodes; i++)
     {
-        for (size_t j = 0; j < number_of_nodes; j++)
+        for (size_t j = i; j < number_of_nodes; j++)
         {
             if(adjacency_matrix.at(i).at(j) != 0)
             {
