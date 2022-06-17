@@ -1,7 +1,26 @@
 Cluster 0:
-	Custo = 0
+	Aresta de 4 para 14 
+	Aresta de 5 para 11 
+	Aresta de 4 para 18 
+	Aresta de 7 para 11 
+	Aresta de 14 para 18 
+	Aresta de 5 para 7 
+	Custo = 812
 Cluster 1:
+	Aresta de 15 para -1 
+	Aresta de 10 para -1 
+	Aresta de 2 para -1 
 	Custo = 0
 Cluster 2:
-	Aresta de 2 para 3 
-	Custo = 6
+	Aresta de 9 para 16 
+	Aresta de 11 para 19 
+	Aresta de 0 para 17 
+	Custo = 463
+Cluster 3:
+	Aresta de 1 para 6 
+	Aresta de 12 para -1 
+	Custo = 68
+Cluster 4:
+	Aresta de 3 para 8 
+	Aresta de 13 para -1 
+	Custo = 33
