@@ -1,5 +1,5 @@
-#ifndef D5A7BFE3_EE51_4CC7_9A59_A52FA8FCD518
-#define D5A7BFE3_EE51_4CC7_9A59_A52FA8FCD518
+#ifndef SOLUTION_HPP
+#define SOLUTION_HPP
 
 #include "defines.hpp"
 #include "Cluster.hpp"
@@ -10,15 +10,24 @@ struct Solution
 {
     cluster_t clusters;
 
-    double solution_cost = 0;
+    double solution_cost;
 
-    Solution();
+    Solution(size_t nClusters, double uBound, double lBound) 
+    {
+        this->clusters.reserve(nClusters);
+        for (size_t i=0; i<nClusters; ++i) {
+            std::shared_ptr<Cluster> c(new Cluster(uBound, lBound));
+            this->clusters.push_back(c);
+        }
+        this->solution_cost = 0;
+    };
 
     void update_cost()
     {
+        this->solution_cost = 0;
         for (size_t i = 0; i < clusters.size(); i++)
         {
-            solution_cost += clusters.at(i)->cluster_cost;
+            this->solution_cost += clusters.at(i)->cluster_cost;
         }
     };
 
@@ -27,7 +36,22 @@ struct Solution
         this->clusters.at(cluster_id)->insertEdge(n1, n2, edge);
         this->update_cost();
     };
+
+    void insert_node_on_cluster(size_t cluster_id, node_ptr n) {
+        this->clusters.at(cluster_id)->insertNode(n);
+    }
+
+    size_t find_minimum_bound_cluster()
+    {
+        size_t min_id = 0;
+        for (size_t i=0; i<this->clusters.size(); ++i) {
+            if (this->clusters.at(i)->current_bound < this->clusters.at(min_id)->current_bound) {
+                min_id = i;
+            }
+        }
+        return min_id;
+    }
 };
 
 
-#endif /* D5A7BFE3_EE51_4CC7_9A59_A52FA8FCD518 */
+#endif /* SOLUTION_HPP */

@@ -1,6 +1,6 @@
 #include "Graph.hpp"
 
-Graph::Graph(size_t nNode, size_t nCluster, size_t lBound, size_t uBound) {
+Graph::Graph(size_t nNode, size_t nCluster, double lBound, double uBound) {
     this->nNodes = nNode;
     // this->nEdges = nEdge;
     this->nClusters = nCluster;
@@ -27,11 +27,11 @@ void Graph::setNEdges(size_t nEdge)
 }
 
 size_t Graph::getNumberNodes() {
-    return this->nNodes;
+    return this->nodeVector.size();
 }
 
 size_t Graph::getNumberEdges() {
-    return this->nEdges;
+    return this->edgeVector.size();
 }
 
 size_t Graph::getNumberClusters() {
@@ -67,4 +67,12 @@ std::shared_ptr<Node> Graph::getNode(int id) {
         }
     }
     return nullptr;
+}
+
+double Graph::getUpperBound() {
+    return this->upperBound;
+}
+
+double Graph::getLowerBound() {
+    return this->lowerBound;
 }

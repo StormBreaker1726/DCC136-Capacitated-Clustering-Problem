@@ -1,5 +1,5 @@
-#ifndef E288782C_0C6A_4F0A_B305_CE7530610665
-#define E288782C_0C6A_4F0A_B305_CE7530610665
+#ifndef ALGORITHMS_HPP
+#define ALGORITHMS_HPP
 
 #include "Solution.hpp"
 #include "Graph.hpp"
@@ -68,4 +68,4 @@ class Algorithms
         // sol_ptr localSearch();
 };
 
-#endif /* E288782C_0C6A_4F0A_B305_CE7530610665 */
+#endif /* ALGORITHMS_HPP */

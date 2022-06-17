@@ -1,5 +1,5 @@
-#ifndef A97DC2E7_94AA_4207_9667_07BC5C5517E9
-#define A97DC2E7_94AA_4207_9667_07BC5C5517E9
+#ifndef CLUSTER_HPP
+#define CLUSTER_HPP
 
 #include "Node.hpp"
 
@@ -12,33 +12,62 @@ struct Cluster
 {
     edge_t id_nodes;
 
-    size_t upper_bound;
-    size_t lower_bound;
+    double upper_bound;
+    double lower_bound;
+    double current_bound; /* custo dos nós ali armazenados */
 
-    double cluster_cost = 0; /* custo das arestas armazenadas */
-    double current_bound = 0; /* custo dos nós ali armazenados */
+    double cluster_cost; /* custo das arestas armazenadas */
 
-    bool insertEdge(node_ptr s_node, node_ptr t_node, edge_ptr edge)
+    Cluster(double uBound, double lBound) {
+        this->id_nodes.reserve(0);
+        this->upper_bound = uBound;
+        this->lower_bound = lBound;
+        this->cluster_cost = 0;
+        this->current_bound = 0;
+    }
+
+    void insertEdge(node_ptr s_node, node_ptr t_node, edge_ptr edge)
     {
-        if(current_bound + s_node->weight() + t_node->weight() <= upper_bound)
+        double bound = s_node->weight() + t_node->weight();
+        for (size_t i=0; i<this->id_nodes.size(); ++i) {
+            /* Se o nó já está num cluster */
+            if (this->id_nodes.at(i).first == s_node->id() || this->id_nodes.at(i).second == s_node->id()) {
+                bound -= s_node->weight();
+                break;
+            }
+        }
+        for (size_t i=0; i<this->id_nodes.size(); ++i) {
+            /* Se o nó já está num cluster */
+            if (this->id_nodes.at(i).first == t_node->id() || this->id_nodes.at(i).second == t_node->id()) {
+                bound -= t_node->weight();
+                break;
+            }
+        }
+        if(current_bound + bound <= upper_bound)
         {
             std::pair<int, int> temp;
             temp.first = s_node->id();
             temp.second = t_node->id();
 
-            id_nodes.push_back(temp);
+            this->id_nodes.push_back(temp);
 
-            cluster_cost += edge->weight();
+            this->cluster_cost += edge->weight();
 
-            current_bound += s_node->weight() + t_node->weight();
+            this->current_bound += bound;
 
-            return true;
-        }
-        else
-        {
-            return false;
+            return;
         }
     };
+
+    void insertNode(node_ptr n)
+    {
+        /* assumindo que todo nó que chega aqui não pertence a nenhum cluster */
+        std::pair<int, int> temp;
+        temp.first = n->id();
+        temp.second = -1;
+        this->current_bound += n->weight();
+        id_nodes.push_back(temp);
+    }
 };
 
-#endif /* A97DC2E7_94AA_4207_9667_07BC5C5517E9 */
+#endif /* CLUSTER_HPP */
