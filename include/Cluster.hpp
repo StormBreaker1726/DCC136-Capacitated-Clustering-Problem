@@ -30,6 +30,11 @@ struct Cluster
     {
         double bound = s_node->weight() + t_node->weight();
         for (size_t i=0; i<this->id_nodes.size(); ++i) {
+            /* Nó já inserido*/
+            if ((this->id_nodes.at(i).first == s_node->id() && this->id_nodes.at(i).second == t_node->id())
+                || (this->id_nodes.at(i).first == t_node->id() && this->id_nodes.at(i).second == s_node->id())) {
+                return false;
+            }
             /* Se o nó já está num cluster */
             if (this->id_nodes.at(i).first == s_node->id() || this->id_nodes.at(i).second == s_node->id()) {
                 bound -= s_node->weight();
@@ -68,6 +73,15 @@ struct Cluster
         temp.second = -1;
         this->current_bound += n->weight();
         id_nodes.push_back(temp);
+    }
+
+    bool findNode(int id) {
+        for (size_t i=0; i<this->id_nodes.size(); ++i) {
+            if (this->id_nodes.at(i).first == id || this->id_nodes.at(i).second == id) {
+                return true;
+            }
+        }
+        return false;
     }
 };
 

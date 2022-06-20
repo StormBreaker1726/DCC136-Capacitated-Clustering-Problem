@@ -55,6 +55,15 @@ struct Solution
         return min_id;
     }
 
+    int getNodeCluster(int id) {
+        for (size_t i=0; i<this->clusters.size(); ++i) {
+            if (this->clusters.at(i)->findNode(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     void print_solution()
     {
         std::ofstream result("resultado.txt");
