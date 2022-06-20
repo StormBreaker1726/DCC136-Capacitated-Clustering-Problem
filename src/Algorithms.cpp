@@ -145,6 +145,27 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
             this->g->getNode(c.t_id),
             this->g->getEdge(c.s_id, c.t_id));
         cand_list.erase(cand_list.begin() + 0);
+        for (size_t j=0; j<cand_list.size(); ++j) {
+            if (cand_list.at(j).s_id == c.s_id ||
+                cand_list.at(j).s_id == c.t_id ||
+                cand_list.at(j).t_id == c.s_id ||
+                cand_list.at(j).t_id == c.t_id) {
+                    cand_list.erase(cand_list.begin() + j);
+                    --j;    
+                }
+        }
+    }
+    cand_list.clear();
+    for (size_t i=0; i<this->g->getNumberEdges(); ++i) {
+        Candidate_Edge c_temp(this->g->getEdgeVector().at(i)->idNode1(), 
+                this->g->getEdgeVector().at(i)->idNode2(), 0,
+                this->g->getNode(this->g->getEdgeVector().at(i)->idNode1())->weight(),
+                this->g->getNode(this->g->getEdgeVector().at(i)->idNode2())->weight(),
+                this->chance_calc(this->g->getEdge(
+                    this->g->getEdgeVector().at(i)->idNode1(),
+                    this->g->getEdgeVector().at(i)->idNode2()),
+                0), false);
+            cand_list.push_back(c_temp);
     }
 
     while (!cand_list.empty()) {
@@ -153,19 +174,19 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
         for (size_t i=0; i<cand_list.size(); ++i) {
             /* Verificar se a aresta possui vértices em nós pertencentes a
             clusters diferentes */
-            Candidate_Edge c = cand_list.at(i);
-            if (!c.viable) {
-                int cluster_1 = this->solution->getNodeCluster(c.s_id);
-                int cluster_2 = this->solution->getNodeCluster(c.t_id);
+            Candidate_Edge* c = &cand_list.at(i);
+            //if (!c->viable) {
+                int cluster_1 = this->solution->getNodeCluster(c->s_id);
+                int cluster_2 = this->solution->getNodeCluster(c->t_id);
                 /* Ambos os nós adjacentes já pertencem a algum cluster */
                 if (cluster_1 != -1 && cluster_2 != -1) {
                     /* Adicionar a aresta apenas melhora a solução */
                     if (cluster_1 == cluster_2) {
                         this->solution->insert_edge_on_cluster(
                             (size_t) cluster_1,
-                            this->g->getNode(c.s_id),
-                            this->g->getNode(c.t_id),
-                            this->g->getEdge(c.s_id, c.t_id));
+                            this->g->getNode(c->s_id),
+                            this->g->getNode(c->t_id),
+                            this->g->getEdge(c->s_id, c->t_id));
                     }
                     cand_list.erase(cand_list.begin() + i);
                     --i;
@@ -173,16 +194,16 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
                 else if (!(cluster_1 == -1 && cluster_2 == -1)) {
                     /* Procura a aresta ligada a um nó pertencente a um cluster */
                     if (cluster_1 == -1) {
-                        c.cluster_id = (size_t) cluster_2;
+                        c->cluster_id = (size_t) cluster_2;
                     } else {
-                        c.cluster_id = (size_t) cluster_1;
+                        c->cluster_id = (size_t) cluster_1;
                     }
-                    c.insertion_chance = this->chance_calc(
-                        this->g->getEdge(c.s_id, c.t_id), c.cluster_id);
-                    c.viable = true;
-                    cand_list_helper.push_back(c);
+                    c->insertion_chance = this->chance_calc(
+                        this->g->getEdge(c->s_id, c->t_id), c->cluster_id);
+                    c->viable = true;
+                    cand_list_helper.push_back(*c);
                 }
-            }
+            //}
         }
         
         if (cand_list_helper.empty()) {
