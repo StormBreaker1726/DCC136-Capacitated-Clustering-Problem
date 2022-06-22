@@ -60,6 +60,9 @@ std::shared_ptr<Edge> Graph::getEdge(int s_id, int t_id) {
 }
 
 std::shared_ptr<Node> Graph::getNode(int id) {
+    if (id == -1) {
+        return nullptr;
+    }
     for (size_t i=0; i<this->nodeVector.size(); ++i) {
         std::shared_ptr<Node> n(this->nodeVector.at(i));
         if (n->id() == id) {

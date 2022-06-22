@@ -7,7 +7,14 @@ Algorithms::Algorithms(std::shared_ptr<Graph> g) {
 }
 
 double Algorithms::penalization(node_ptr n1, node_ptr n2, size_t cluster_id) {
-    double nodes_weight = n1->weight() + n2->weight();
+    double nodes_weight = 0;
+    if (n1 == nullptr) {
+        nodes_weight = n2->weight();
+    } else if (n2 == nullptr) {
+        nodes_weight = n1->weight();
+    } else {
+        nodes_weight = n1->weight() + n2->weight();
+    }
     std::shared_ptr<Cluster> cluster = this->solution->clusters.at(cluster_id);
     double f1 = (nodes_weight) + cluster->current_bound;
     if (cluster->lower_bound == 0) {
@@ -282,10 +289,65 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
     return this->solution;
 }
 
+sol_ptr Algorithms::greedyNodesHelper(float alpha) {
+    std::vector<Candidate_Node> cand_list;
+    cand_list.reserve(this->g->getNumberNodes());
+
+    /* RISCO DE VIR SOLUÇÃO INVIÁVEL!!! */
+
+    /* cria candidato tentando colocar no melhor cluster atual */ 
+    for (size_t i=0; i<this->g->getNumberNodes(); ++i) {
+        double bestPen = MAXFLOAT;
+        size_t c_id = 0;
+        for (size_t j=0; j<this->g->getNumberClusters(); ++j) {
+            if (bestPen < this->penalization(this->g->getNodeVector().at(i), nullptr, j)) {
+                bestPen = this->penalization(this->g->getNodeVector().at(i), nullptr, j);
+                c_id = j;
+            }
+        }
+        Candidate_Node c_node(this->g->getNodeVector().at(i)->id(), bestPen, c_id);
+    }
+
+
+    while (!cand_list.empty()) {
+        std::sort(cand_list.begin(), cand_list.end(), 
+            [](Candidate_Node& a, Candidate_Node& b) {
+                return a.penalization < b.penalization;
+            });
+        /* Seleciona um candidato aleatório */
+        size_t nElmts = alpha * cand_list.size();
+        size_t cand_n = nElmts == 0 ? 0 : rand() % nElmts;
+        Candidate_Node c = cand_list.at(cand_n);
+
+        this->solution->insert_node_on_cluster(c.cluster_id, this->g->getNode(c.node_id));
+        cand_list.erase(cand_list.begin() + cand_n);
+
+        for (size_t i=0; i<this->g->getNumberNodes(); ++i) {
+            double bestPen = cand_list.at(0).penalization;
+            size_t c_id = cand_list.at(0).cluster_id;
+            for (size_t j=0; j<this->g->getNumberClusters(); ++j) {
+                double pen = this->penalization(this->g->getNode(c.node_id), nullptr, j);
+                if (bestPen < pen) {
+                    bestPen = pen;
+                    c_id = j;
+                }
+            }
+            cand_list.at(i).cluster_id = c_id;
+            cand_list.at(i).penalization = bestPen;
+        }
+    }
+    /* Falta criar um módulo para criar as arestas */
+    return this->solution;
+}
+
 sol_ptr Algorithms::greedy() {
     return this->greedyHelper(0);
 }
 
 sol_ptr Algorithms::greedyCheaper() {
     return this->greedyCheaperHelper(0);
+}
+
+sol_ptr Algorithms::greedyNodes() {
+    return this->greedyNodesHelper(0);
 }

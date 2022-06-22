@@ -57,16 +57,30 @@ class Algorithms
             };
         };
 
+        struct Candidate_Node {
+            int node_id;
+            double penalization;
+            size_t cluster_id;
+
+            Candidate_Node(int node_id, double pen, size_t c_id) {
+                this->node_id = node_id;
+                this->penalization = pen;
+                this->cluster_id = c_id;
+            };
+        };
+
         sol_ptr solution;
         double penalization(node_ptr n1, node_ptr n2, size_t cluster_id);
         double chance_calc(edge_ptr e, size_t cluster_id);
         sol_ptr greedyHelper(float alpha);
         sol_ptr greedyCheaperHelper(float alpha);
+        sol_ptr greedyNodesHelper(float alpha);
         //std::vector<Candidate_Edge> update_cand_list(std::vector<Candidate_Edge>& cand_list);
     public:
         Algorithms(std::shared_ptr<Graph> g);
         sol_ptr greedy();
         sol_ptr greedyCheaper();
+        sol_ptr greedyNodes();
         // sol_ptr localSearch();
 };
 
