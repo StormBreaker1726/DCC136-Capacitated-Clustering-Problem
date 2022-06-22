@@ -109,6 +109,8 @@ sol_ptr Algorithms::greedyHelper(float alpha) {
         });
     for (size_t i=0; i<nodes.size(); ++i) {
         this->solution->insert_node_on_cluster(this->solution->find_minimum_bound_cluster(), nodes.at(i));
+        nodes.erase(nodes.begin() + i);
+        --i;
     }
 
     return this->solution;
@@ -120,8 +122,12 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
     cand_list.reserve(g->getNumberEdges());
     std::vector<Candidate_Edge> cand_list_helper;
     cand_list_helper.reserve(g->getNumberEdges());
+    std::vector<node_ptr> nodes;
+    nodes.reserve(g->getNumberNodes());
+    nodes = g->getNodeVector();
 
     for (size_t i=0; i<this->g->getNumberEdges(); ++i) {
+        std::cout << i << "\n";
         Candidate_Edge c_temp(this->g->getEdgeVector().at(i)->idNode1(), 
                 this->g->getEdgeVector().at(i)->idNode2(), 0,
                 this->g->getNode(this->g->getEdgeVector().at(i)->idNode1())->weight(),
@@ -139,20 +145,37 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
             });
 
     for (size_t i=0; i<this->g->getNumberClusters(); ++i) {
-        Candidate_Edge c = cand_list.at(0);
-        this->solution->insert_edge_on_cluster(i,
-            this->g->getNode(c.s_id),
-            this->g->getNode(c.t_id),
-            this->g->getEdge(c.s_id, c.t_id));
-        cand_list.erase(cand_list.begin() + 0);
-        for (size_t j=0; j<cand_list.size(); ++j) {
-            if (cand_list.at(j).s_id == c.s_id ||
-                cand_list.at(j).s_id == c.t_id ||
-                cand_list.at(j).t_id == c.s_id ||
-                cand_list.at(j).t_id == c.t_id) {
-                    cand_list.erase(cand_list.begin() + j);
-                    --j;    
+        if (nodes.empty()) {
+            return this->solution;
+        }
+        if (cand_list.empty()) {
+            this->solution->insert_node_on_cluster(i, nodes.at(0));
+            nodes.erase(nodes.begin() + 0);
+        } else {
+            Candidate_Edge c = cand_list.at(0);
+            if (!(this->solution->insert_edge_on_cluster(i,
+                this->g->getNode(c.s_id),
+                this->g->getNode(c.t_id),
+                this->g->getEdge(c.s_id, c.t_id)))) {
+                    --i;
+            } else {
+                for (size_t j=0; j<nodes.size(); ++j) {
+                        if (nodes.at(j)->id() == c.s_id || nodes.at(j)->id() == c.t_id) {
+                            nodes.erase(nodes.begin() + j);
+                            --j;
+                        }
                 }
+            }
+            cand_list.erase(cand_list.begin() + 0);
+            for (size_t j=0; j<cand_list.size(); ++j) {
+                if (cand_list.at(j).s_id == c.s_id ||
+                    cand_list.at(j).s_id == c.t_id ||
+                    cand_list.at(j).t_id == c.s_id ||
+                    cand_list.at(j).t_id == c.t_id) {
+                        cand_list.erase(cand_list.begin() + j);
+                        --j;    
+                    }
+            }
         }
     }
     cand_list.clear();
@@ -228,9 +251,31 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
                 this->g->getEdge(c.s_id, c.t_id))) 
             {
                 cand_list_helper.erase(cand_list_helper.begin() + cand_n);
+                if (cand_list_helper.empty()) {
+                    cand_list.clear();
+                }
             } else {
+                for (size_t i=0; i<nodes.size(); ++i) {
+                    if (nodes.at(i)->id() == c.s_id || nodes.at(i)->id() == c.t_id) {
+                        nodes.erase(nodes.begin() + i);
+                        break;
+                    }
+                }
                 cand_list_helper.clear();  
             }
+        }
+    }
+
+    if (!nodes.empty()) {
+        /* adicionar os nós que faltam nos clusters */
+        std::sort(nodes.begin(), nodes.end(), 
+            [](node_ptr& a, node_ptr& b) {
+                return a->weight() > b->weight();
+            });
+        for (size_t i=0; i<nodes.size(); ++i) {
+            this->solution->insert_node_on_cluster(this->solution->find_minimum_bound_cluster(), nodes.at(i));
+            nodes.erase(nodes.begin() + i);
+            --i;
         }
     }
 

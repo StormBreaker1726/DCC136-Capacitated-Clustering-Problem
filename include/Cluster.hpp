@@ -83,6 +83,13 @@ struct Cluster
         }
         return false;
     }
+
+    bool excedes_bound(double cost) {
+        if (this->current_bound + cost > this->upper_bound) {
+            return true;
+        }
+        return false;
+    }
 };
 
 #endif /* CLUSTER_HPP */
