@@ -6,6 +6,8 @@
 #include "Edge.hpp"
 #include "Solution.hpp"
 
+using edge_ptr = std::shared_ptr<Edge>;
+using node_ptr = std::shared_ptr<Node>;
 class Graph {
     private:
         size_t nNodes;

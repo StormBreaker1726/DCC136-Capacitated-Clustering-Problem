@@ -38,7 +38,7 @@ size_t Graph::getNumberClusters() {
     return this->nClusters;
 }
 
-std::vector<std::shared_ptr<Node>> Graph::getNodeVector() {
+std::vector<node_ptr> Graph::getNodeVector() {
     return this->nodeVector;
 }
 
@@ -63,13 +63,17 @@ std::shared_ptr<Node> Graph::getNode(int id) {
     if (id == -1) {
         return nullptr;
     }
+    /*
     for (size_t i=0; i<this->nodeVector.size(); ++i) {
         std::shared_ptr<Node> n(this->nodeVector.at(i));
         if (n->id() == id) {
             return n;
         }
     }
+    
     return nullptr;
+    */
+    return this->nodeVector.at(id); 
 }
 
 double Graph::getUpperBound() {
