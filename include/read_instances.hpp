@@ -3,6 +3,7 @@
 
 #include "Graph.hpp"
 
+
 std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
 {
     size_t number_of_nodes;
@@ -115,5 +116,12 @@ std::shared_ptr<Graph> read_ran_and_sparse(std::ifstream& instance_file)
     return graph_to_operate;
 }
 
+std::shared_ptr<Graph> read(std::ifstream& instance_file, std::string handover) {
+    if (handover == "1") {
+        return read_handover(instance_file);
+    } else {
+        return read_ran_and_sparse(instance_file);
+    }
+}
 
 #endif /* FBCBAACF_3699_4CDA_9FC8_E1FFED46D735 */

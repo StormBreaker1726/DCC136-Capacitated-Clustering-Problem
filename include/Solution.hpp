@@ -66,9 +66,8 @@ struct Solution
         return -1;
     }
 
-    void print_solution()
+    void print_solution(std::ofstream& result)
     {
-        std::ofstream result("resultado.txt");
         for (size_t i = 0; i < this->clusters.size(); i++)
         {
             result<<"Cluster "<<i<<":"<<std::endl;
@@ -81,26 +80,26 @@ struct Solution
     }
 
     bool solutionViable() {
-    for (size_t i=0; i<this->clusters.size(); ++i) {
-        if (this->clusters.at(i)->upper_bound < this->clusters.at(i)->current_bound) {
-            std::cerr << "Cluster: " << i << "\n";
-            std::cerr << "Bounds: [" << 
-                this->clusters.at(i)->lower_bound << " - " <<
-                this->clusters.at(i)->upper_bound << "]\n";
-            std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
-            return false;
+        for (size_t i=0; i<this->clusters.size(); ++i) {
+            if (this->clusters.at(i)->upper_bound < this->clusters.at(i)->current_bound) {
+                std::cerr << "Cluster: " << i << "\n";
+                std::cerr << "Bounds: [" << 
+                    this->clusters.at(i)->lower_bound << " - " <<
+                    this->clusters.at(i)->upper_bound << "]\n";
+                std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
+                return false;
+            }
+            if (this->clusters.at(i)->lower_bound > this->clusters.at(i)->current_bound) {
+                std::cerr << "Cluster: " << i << "\n";
+                std::cerr << "Bounds: [" << 
+                    this->clusters.at(i)->lower_bound << " - " <<
+                    this->clusters.at(i)->upper_bound << "]\n";
+                std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
+                return false;
+            }
         }
-        if (this->clusters.at(i)->lower_bound > this->clusters.at(i)->current_bound) {
-            std::cerr << "Cluster: " << i << "\n";
-            std::cerr << "Bounds: [" << 
-                this->clusters.at(i)->lower_bound << " - " <<
-                this->clusters.at(i)->upper_bound << "]\n";
-            std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
-            return false;
-        }
+        return true;
     }
-    return true;
-}
 };
 
 
