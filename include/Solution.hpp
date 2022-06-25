@@ -5,6 +5,8 @@
 #include "Cluster.hpp"
 
 using cluster_t = std::vector<std::shared_ptr<Cluster>>;
+using edge_ptr = std::shared_ptr<Edge>;
+using node_ptr = std::shared_ptr<Node>;
 
 struct Solution
 {

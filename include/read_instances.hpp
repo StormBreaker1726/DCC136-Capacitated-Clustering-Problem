@@ -51,10 +51,12 @@ std::shared_ptr<Graph> read_handover(std::ifstream& instance_file)
             if(adjacency_matrix.at(i).at(j) != 0)
             {
                 graph_to_operate->insertEdge(i, j, adjacency_matrix.at(i).at(j));
+                graph_to_operate->getNode(i)->insert_edge(j, adjacency_matrix.at(i).at(j));
+                graph_to_operate->getNode(j)->insert_edge(i, adjacency_matrix.at(i).at(j));
             }
         }
     }
-    std::cout<<"Leu td"<<std::endl;
+    std::cout<<"Instância Lida"<<std::endl;
     return graph_to_operate;
 }
 
@@ -104,10 +106,12 @@ std::shared_ptr<Graph> read_ran_and_sparse(std::ifstream& instance_file)
         instance_file >> node_weight;
         number_of_edges++;
         graph_to_operate->insertEdge(source_id, target_id, node_weight);
+        graph_to_operate->getNode(source_id)->insert_edge(target_id, node_weight);
+        graph_to_operate->getNode(target_id)->insert_edge(source_id, node_weight);
     }
 
     graph_to_operate->setNEdges(number_of_edges);
-    std::cout<<"Leu td"<<std::endl;
+    std::cout<<"Instância Lida"<<std::endl;
     return graph_to_operate;
 }
 
