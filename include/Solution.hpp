@@ -79,6 +79,28 @@ struct Solution
             result<<"\tCusto = "<<this->clusters.at(i)->cluster_cost<<"\n";
         }
     }
+
+    bool solutionViable() {
+    for (size_t i=0; i<this->clusters.size(); ++i) {
+        if (this->clusters.at(i)->upper_bound < this->clusters.at(i)->current_bound) {
+            std::cerr << "Cluster: " << i << "\n";
+            std::cerr << "Bounds: [" << 
+                this->clusters.at(i)->lower_bound << " - " <<
+                this->clusters.at(i)->upper_bound << "]\n";
+            std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
+            return false;
+        }
+        if (this->clusters.at(i)->lower_bound > this->clusters.at(i)->current_bound) {
+            std::cerr << "Cluster: " << i << "\n";
+            std::cerr << "Bounds: [" << 
+                this->clusters.at(i)->lower_bound << " - " <<
+                this->clusters.at(i)->upper_bound << "]\n";
+            std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
+            return false;
+        }
+    }
+    return true;
+}
 };
 
 
