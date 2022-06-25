@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/debug",
-            "args": ["${workspaceFolder}/instances/test.txt", "dummy", "0"],
+            "args": ["${workspaceFolder}/instances/Instancias-ccplib/ccplib/RanReal240/RanReal240_01.txt", "dummy", "0"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
