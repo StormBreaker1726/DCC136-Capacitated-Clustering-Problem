@@ -67,7 +67,8 @@ void Algorithms::insert_all_edges() {
     this->solution->update_cost();
 }
 
-sol_ptr Algorithms::greedyHelper(float alpha) {
+sol_ptr Algorithms::greedyFirstHelper(float alpha) {
+    this->solution->clean_solution();
     std::vector<Candidate_Edge> cand_list;
     cand_list.reserve(this->g->getNumberEdges() * this->g->getNumberClusters());
     /* Marcar quais nós não foram inseridos */
@@ -157,6 +158,7 @@ sol_ptr Algorithms::greedyHelper(float alpha) {
 
 sol_ptr Algorithms::greedyCheaperHelper(float alpha)
 {
+    this->solution->clean_solution();
     std::vector<Candidate_Edge> cand_list;
     cand_list.reserve(g->getNumberEdges());
     std::vector<Candidate_Edge> cand_list_helper;
@@ -166,7 +168,6 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
     nodes = g->getNodeVector();
 
     for (size_t i=0; i<this->g->getNumberEdges(); ++i) {
-        std::cout << i << "\n";
         Candidate_Edge c_temp(this->g->getEdgeVector().at(i)->idNode1(), 
                 this->g->getEdgeVector().at(i)->idNode2(), 0,
                 this->g->getNode(this->g->getEdgeVector().at(i)->idNode1())->weight(),
@@ -322,6 +323,7 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
 }
 
 sol_ptr Algorithms::greedyNodesHelper(float alpha) {
+    this->solution->clean_solution();
     std::vector<Candidate_Node> cand_list;
     cand_list.reserve(this->g->getNumberNodes());
 
@@ -374,8 +376,8 @@ sol_ptr Algorithms::greedyNodesHelper(float alpha) {
     return this->solution;
 }
 
-sol_ptr Algorithms::greedy() {
-    return this->greedyHelper(0);
+sol_ptr Algorithms::greedyFirst() {
+    return this->greedyFirstHelper(0);
 }
 
 sol_ptr Algorithms::greedyCheaper() {
@@ -384,4 +386,40 @@ sol_ptr Algorithms::greedyCheaper() {
 
 sol_ptr Algorithms::greedyNodes() {
     return this->greedyNodesHelper(0);
+}
+
+sol_ptr Algorithms::greedy(float alpha, size_t it) {
+
+    Solution sBest = *this->greedyNodesHelper(0);
+
+    if (this->g->getNumberEdges() > 400) {
+        for (size_t i=1; i<it; ++i) {
+            Solution s = *this->greedyNodesHelper(alpha);
+            if (s.solution_cost > sBest.solution_cost) {
+                sBest = s;
+            }
+        }
+        return std::make_shared<Solution>(sBest);
+    }
+    for (size_t i=1; i<it; ++i) {
+        size_t cand_n = rand() % 2;
+        if (cand_n == 0) {
+            Solution s = *this->greedyNodesHelper(alpha);
+            if (s.solution_cost > sBest.solution_cost) {
+                    sBest = s;
+            }
+        } else if (cand_n == 1) {
+            Solution s = *this->greedyCheaperHelper(alpha);
+            if (s.solution_cost > sBest.solution_cost) {
+                    sBest = s;
+            }
+        } else {
+            /* Demora muito - o rand ali não chega aqui */
+            Solution s = *this->greedyFirstHelper(alpha);
+            if (s.solution_cost > sBest.solution_cost) {
+                    sBest = s;
+            }
+        }
+    }
+    return std::make_shared<Solution>(sBest);
 }

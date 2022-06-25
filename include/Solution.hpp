@@ -100,6 +100,15 @@ struct Solution
         }
         return true;
     }
+
+    void clean_solution() {
+        for (size_t i=0; i<this->clusters.size(); ++i) {
+            this->clusters.at(i)->id_nodes.clear();
+            this->clusters.at(i)->current_bound = 0;
+            this->clusters.at(i)->cluster_cost = 0;
+        }
+        this->solution_cost = 0;
+    }
 };
 
 
