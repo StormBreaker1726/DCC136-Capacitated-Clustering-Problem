@@ -72,6 +72,7 @@ class Algorithms
         sol_ptr solution;
         double penalization(node_ptr n1, node_ptr n2, size_t cluster_id);
         double chance_calc(edge_ptr e, size_t cluster_id);
+        void insert_all_edges();
         sol_ptr greedyHelper(float alpha);
         sol_ptr greedyCheaperHelper(float alpha);
         sol_ptr greedyNodesHelper(float alpha);

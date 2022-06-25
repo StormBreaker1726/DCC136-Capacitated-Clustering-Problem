@@ -33,7 +33,39 @@ double Algorithms::chance_calc(edge_ptr e, size_t cluster_id) {
     return 2*e->weight() + this->penalization(g->getNode(e->idNode1()), g->getNode(e->idNode2()), cluster_id);
 }
 
-
+void Algorithms::insert_all_edges() {
+    for (size_t c_id=0; c_id<this->solution->clusters.size(); ++c_id) {
+        size_t n = this->solution->clusters.at(c_id)->id_nodes.size();
+        for (size_t i=0; i<n-1 && i<this->solution->clusters.at(c_id)->id_nodes.size()-1; ++i) {
+            std::pair<int, int>* v_i = &this->solution->clusters.at(c_id)->id_nodes.at(i);
+            for (size_t j=i+1; j<n && j<this->solution->clusters.at(c_id)->id_nodes.size(); ++j) {
+                std::pair<int, int>* v_next = &this->solution->clusters.at(c_id)->id_nodes.at(j);
+                /* Se tiver aresta entre dois vértices*/
+                if (this->g->getNode(v_i->first)->edge_weight(v_next->first) > 0 
+                    && v_i->first != v_next->second && v_i->second != v_next->first) {
+                    //this->solution->solution_cost += this->g->getNode(v_i->first)->edge_weight(v_next->first);
+                    this->solution->clusters.at(c_id)->cluster_cost += this->g->getNode(v_i->first)->edge_weight(v_next->first);
+                    if (v_next->second == -1) {
+                        v_next->second = v_i->first;
+                    } else if (v_i->second == -1) {
+                        v_i->second = v_next->first;
+                    } else {
+                        this->solution->clusters.at(c_id)->id_nodes.push_back({v_i->first, v_next->first});
+                        v_i = &this->solution->clusters.at(c_id)->id_nodes.at(i);
+                    }
+                    if (v_i->second == -1) {
+                        this->solution->clusters.at(c_id)->id_nodes.erase(
+                            this->solution->clusters.at(c_id)->id_nodes.begin() + i
+                        );
+                        if (i>0) --i;
+                        if (j>0) --j;
+                    }
+                }
+            }
+        }
+    }
+    this->solution->update_cost();
+}
 
 sol_ptr Algorithms::greedyHelper(float alpha) {
     std::vector<Candidate_Edge> cand_list;
@@ -285,7 +317,7 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
             --i;
         }
     }
-
+    this->insert_all_edges();
     return this->solution;
 }
 
@@ -306,6 +338,7 @@ sol_ptr Algorithms::greedyNodesHelper(float alpha) {
             }
         }
         Candidate_Node c_node(this->g->getNodeVector().at(i)->id(), bestPen, c_id);
+        cand_list.push_back(c_node);
     }
 
 
@@ -322,12 +355,12 @@ sol_ptr Algorithms::greedyNodesHelper(float alpha) {
         this->solution->insert_node_on_cluster(c.cluster_id, this->g->getNode(c.node_id));
         cand_list.erase(cand_list.begin() + cand_n);
 
-        for (size_t i=0; i<this->g->getNumberNodes(); ++i) {
-            double bestPen = cand_list.at(0).penalization;
-            size_t c_id = cand_list.at(0).cluster_id;
+        for (size_t i=0; i<cand_list.size(); ++i) {
+            double bestPen = MAXFLOAT;
+            size_t c_id = cand_list.at(i).cluster_id;
             for (size_t j=0; j<this->g->getNumberClusters(); ++j) {
                 double pen = this->penalization(this->g->getNode(c.node_id), nullptr, j);
-                if (bestPen < pen) {
+                if (bestPen > pen) {
                     bestPen = pen;
                     c_id = j;
                 }
@@ -336,7 +369,8 @@ sol_ptr Algorithms::greedyNodesHelper(float alpha) {
             cand_list.at(i).penalization = bestPen;
         }
     }
-    /* Falta criar um módulo para criar as arestas */
+    /* Cria as arestas */
+    this->insert_all_edges();
     return this->solution;
 }
 
