@@ -1,6 +1,11 @@
 #include "Algorithms.hpp"
 #include "read_instances.hpp"
 
+#include <chrono>
+
+using relogio_t = std::chrono::high_resolution_clock;
+using tempo_t  = relogio_t::time_point;
+
 #define OPEN_FILE(fileObj, fileName)                                           \
     do {                                                                       \
         fileObj.open(fileName);                                                \
@@ -29,12 +34,17 @@ int main(int argc, char const *argv[])
 
     float alpha = std::stof(argv[4]);
 
-    std::shared_ptr<Algorithms> a(new Algorithms(read(inputFile, handover))); 
-    std::shared_ptr<Solution> s(a->greedyNodes());
+    std::shared_ptr<Algorithms> a(new Algorithms(read(inputFile, handover)));
+
+    tempo_t start = relogio_t::now();
+    std::shared_ptr<Solution> s(a->greedy(alpha, 100));
+    tempo_t end = relogio_t::now();
+    double delta = std::chrono::duration_cast<std::chrono::milliseconds>((end) - (start)).count();
     
     s->print_solution(outputFile);
 
-    std::cout << "\nQualidade Cheaper: " << s->solution_cost << "\n";
+    std::cout << "\nQualidade: " << s->solution_cost << "\n";
+    std::cout << "Tempo de execução: " << delta << "\n";
     
     if (!s->solutionViable()) {
         std::cout << "\n\nNão é viável!\n\n";
