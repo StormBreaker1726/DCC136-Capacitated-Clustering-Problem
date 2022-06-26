@@ -26,6 +26,9 @@ int main(int argc, char const *argv[])
         return 2;
     }
 
+    long seed = time(NULL)*time(NULL)/rand();
+    srand(seed);
+
     std::ifstream inputFile;
     OPEN_FILE(inputFile, argv[1]);
     std::ofstream outputFile;
@@ -42,8 +45,9 @@ int main(int argc, char const *argv[])
     double delta = std::chrono::duration_cast<std::chrono::milliseconds>((end) - (start)).count();
     
     s->print_solution(outputFile);
-
-    std::cout << "\nQualidade: " << s->solution_cost << "\n";
+    std::cout << "\n\nEndereço: " << &s;
+    std::cout << "\nSeed: " << seed << "\n";
+    std::cout << "Qualidade: " << s->solution_cost << "\n";
     std::cout << "Tempo de execução: " << delta << "\n";
     
     if (!s->solutionViable()) {

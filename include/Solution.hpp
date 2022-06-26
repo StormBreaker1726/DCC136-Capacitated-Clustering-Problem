@@ -109,6 +109,17 @@ struct Solution
         }
         this->solution_cost = 0;
     }
+
+    std::shared_ptr<Solution> clone() {
+        std::shared_ptr<Solution> s(new Solution(this->clusters.size(),
+            this->clusters.at(0)->upper_bound,
+            this->clusters.at(0)->lower_bound));
+        s->solution_cost = this->solution_cost;
+        for (size_t id_c = 0; id_c < this->clusters.size(); ++id_c) {
+            this->clusters.at(id_c)->copy_into(s->clusters.at(id_c));
+        }
+        return s;
+    }
 };
 
 

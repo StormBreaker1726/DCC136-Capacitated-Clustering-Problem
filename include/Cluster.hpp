@@ -90,6 +90,14 @@ struct Cluster
         }
         return false;
     }
+
+    void copy_into(std::shared_ptr<Cluster>& c) {
+        c->current_bound = this->current_bound;
+        c->cluster_cost = this->cluster_cost;
+        for (size_t i=0; i<this->id_nodes.size(); ++i) {
+            c->id_nodes.push_back({id_nodes.at(i).first, id_nodes.at(i).second});
+        }
+    }
 };
 
 #endif /* CLUSTER_HPP */
