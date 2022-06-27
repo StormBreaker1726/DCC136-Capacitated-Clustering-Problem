@@ -44,8 +44,12 @@ int main(int argc, char const *argv[])
     tempo_t end = relogio_t::now();
     double delta = std::chrono::duration_cast<std::chrono::milliseconds>((end) - (start)).count();
     
+    outputFile << "Seed: " << seed << "\n";
+    outputFile << "Qualidade: " << s->solution_cost << "\n";
+    outputFile << "Tempo de execução: " << delta << "\n\n";
+    
     s->print_solution(outputFile);
-    std::cout << "\n\nEndereço: " << &s;
+
     std::cout << "\nSeed: " << seed << "\n";
     std::cout << "Qualidade: " << s->solution_cost << "\n";
     std::cout << "Tempo de execução: " << delta << "\n";

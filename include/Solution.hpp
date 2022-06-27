@@ -70,7 +70,10 @@ struct Solution
     {
         for (size_t i = 0; i < this->clusters.size(); i++)
         {
-            result<<"Cluster "<<i<<":"<<std::endl;
+            result << "Cluster " << i << ":\n";
+            result << "\t[ " << this->clusters.at(i)->lower_bound <<
+                " - " << this->clusters.at(i)->upper_bound << " ] ";
+            result << this->clusters.at(i)->current_bound << "\n"; 
             for (size_t j = 0; j < this->clusters.at(i)->id_nodes.size(); j++)
             {
                 result<<"\tAresta de "<<this->clusters.at(i)->id_nodes.at(j).first<<" para "<<this->clusters.at(i)->id_nodes.at(j).second<<" "<<std::endl;
