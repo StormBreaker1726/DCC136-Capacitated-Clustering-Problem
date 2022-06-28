@@ -91,6 +91,23 @@ struct Cluster
         return false;
     }
 
+    std::vector<int> getNodes() {
+        std::set<int> aux_set;
+        for (size_t i=0; i<this->id_nodes.size(); ++i) {
+            aux_set.insert(this->id_nodes.at(i).first);
+            if (this->id_nodes.at(i).second != -1) {
+                aux_set.insert(this->id_nodes.at(i).second);
+            }
+        }
+        return std::vector<int>(aux_set.begin(), aux_set.end());
+    }
+
+    void clearCluster() {
+        this->id_nodes.clear();
+        this->current_bound = 0;
+        this->cluster_cost = 0;
+    }
+
     void copy_into(std::shared_ptr<Cluster>& c) {
         c->current_bound = this->current_bound;
         c->cluster_cost = this->cluster_cost;

@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
     std::shared_ptr<Algorithms> a(new Algorithms(read(inputFile, handover)));
 
     tempo_t start = relogio_t::now();
-    std::shared_ptr<Solution> s(a->greedy(alpha, 100));
+    std::shared_ptr<Solution> s(a->iteratedGreedy(alpha, 100));
     tempo_t end = relogio_t::now();
     double delta = std::chrono::duration_cast<std::chrono::milliseconds>((end) - (start)).count();
     

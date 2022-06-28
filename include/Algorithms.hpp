@@ -77,12 +77,15 @@ class Algorithms
         sol_ptr greedyCheaperHelper(float alpha);
         sol_ptr greedyNodesHelper(float alpha);
         //std::vector<Candidate_Edge> update_cand_list(std::vector<Candidate_Edge>& cand_list);
+        sol_ptr destruction(Solution& s, std::vector<int>& nodes);
+        sol_ptr construction(Solution& s, std::vector<int>& nodes);
     public:
         Algorithms(std::shared_ptr<Graph> g);
         sol_ptr greedy(float alpha, size_t it);
         sol_ptr greedyFirst();
         sol_ptr greedyCheaper();
         sol_ptr greedyNodes();
+        sol_ptr iteratedGreedy(float alpha, size_t it);
         // sol_ptr localSearch();
 };
 

@@ -399,7 +399,8 @@ sol_ptr Algorithms::greedy(float alpha, size_t it) {
                 sBest = *s.clone();
             }
         }
-        return std::make_shared<Solution>(sBest);
+        this->solution = std::make_shared<Solution>(sBest);
+        return this->solution;
     }
 
     for (size_t i=1; i<it; ++i) {
@@ -423,5 +424,109 @@ sol_ptr Algorithms::greedy(float alpha, size_t it) {
             }
         }
     }
-    return std::make_shared<Solution>(sBest);
+    this->solution = std::make_shared<Solution>(sBest);
+    return this->solution;
+}
+
+sol_ptr Algorithms::destruction(Solution& s, std::vector<int>& nodes) {
+    // escolher dois clusters:
+    size_t escolha = rand() % 3;
+    
+    if (escolha == 0) {
+    // 1: Escolher o mais pesado com o mais leve:
+        size_t id_leve = 0;
+        size_t id_pesa = 0;
+        for (size_t i=0; i<s.clusters.size(); ++i) {
+            if (s.clusters.at(i)->current_bound < s.clusters.at(id_leve)->current_bound) {
+                id_leve = i;
+            }
+            else if (s.clusters.at(i)->current_bound > s.clusters.at(id_pesa)->current_bound) {
+                id_pesa = i;
+            }
+        }
+        // pegar os vértices de cada cluster
+        nodes = s.clusters.at(id_leve)->getNodes();
+        do {
+            std::vector<int> helper = s.clusters.at(id_pesa)->getNodes();
+            nodes.insert(nodes.end(), helper.begin(), helper.end());
+        } while (0);
+        s.clusters.at(id_leve)->clearCluster();
+        s.clusters.at(id_pesa)->clearCluster();
+
+    } else if (escolha == 1) {
+    // 2: Escolher os dois mais baratos
+        size_t bar1 = 0;
+        size_t bar2 = 1;
+        for (size_t i=0; i<s.clusters.size(); ++i) {
+            if (s.clusters.at(i)->cluster_cost < s.clusters.at(bar1)->cluster_cost) {
+                bar2 = bar1;
+                bar1 = i;
+            } else if (s.clusters.at(i)->cluster_cost < s.clusters.at(bar2)->cluster_cost) {
+                bar2 = i;
+            }
+        }
+        nodes = s.clusters.at(bar1)->getNodes();
+        do {
+            std::vector<int> helper = s.clusters.at(bar2)->getNodes();
+            nodes.insert(nodes.end(), helper.begin(), helper.end());
+        } while (0);
+        s.clusters.at(bar1)->clearCluster();
+        s.clusters.at(bar2)->clearCluster();
+    } else {
+    // 3: Escolher dois aleatórios
+        do {
+            std::set<int> randomClusters;
+            for (size_t i=0; i<2; i++) {
+                randomClusters.insert(rand() % s.clusters.size());
+            }
+            nodes = s.clusters.at(*randomClusters.begin())->getNodes();
+            std::vector<int> vec_help = s.clusters.at(*randomClusters.begin()+1)->getNodes();
+            nodes.insert(nodes.end(), vec_help.begin(), vec_help.end());
+            s.clusters.at(*randomClusters.begin())->clearCluster();
+            s.clusters.at(*randomClusters.begin()+1)->clearCluster();
+        } while (0);
+    } 
+
+    return std::make_shared<Solution>(s);
+}
+
+sol_ptr Algorithms::construction(Solution& s, std::vector<int>& nodes) {
+    
+    std::vector<Candidate_Node> cand_list;
+    cand_list.reserve(nodes.size());
+    
+    return std::make_shared<Solution>(s);
+}
+
+sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it) {
+    std::vector<int> nodes;
+    nodes.reserve(this->g->getNumberNodes());
+    
+    Solution s = *this->greedy(alpha, it);
+    Solution sBest = *s.clone();
+
+
+    size_t no_improv = 0;
+    while (true) {
+        /* DESTROI 2 CLUSTERS */
+        s = *this->destruction(s, nodes);
+
+        /* REMONTA OS CLUSTERS */
+        s = *this->construction(s, nodes);
+
+        this->solution = std::make_shared<Solution>(s);
+        return this->solution;
+
+        if (s.solution_cost < sBest.solution_cost) {
+            sBest = *s.clone();
+        } else {
+            /* sem melhora */
+            ++no_improv;
+        }
+        if (no_improv > 20) {
+            break;
+        }
+    }
+    this->solution = std::make_shared<Solution>(sBest);
+    return this->solution;
 }
