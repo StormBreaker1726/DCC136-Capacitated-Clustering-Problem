@@ -129,6 +129,25 @@ struct Solution
         }
         return s;
     }
+
+    void printNodes() {
+        std::ofstream of;
+        of.open("./solution/vertices.txt");
+        if (!of.is_open()) {
+            std::cerr << "Não foi possível abrir o arquivo.";
+            return;
+        }
+        of << "S = {";
+        for (size_t i=0; i<this->clusters.size(); ++i) {
+            std::vector<int> nodes = this->clusters.at(i)->getNodes();
+            of << "{ ";
+            for (size_t j=0; j<nodes.size(); ++j) {
+                of << ", " << nodes.at(j);
+            }
+            of << "}, ";
+        }
+        of << "}";
+    } 
 };
 
 

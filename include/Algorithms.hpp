@@ -86,7 +86,8 @@ class Algorithms
         sol_ptr greedyFirst();
         sol_ptr greedyCheaper();
         sol_ptr greedyNodes();
-        sol_ptr iteratedGreedy(float alpha, size_t it);
+        sol_ptr iteratedGreedy(float alpha, size_t it, tempo_t inicio);
+        sol_ptr buscaLocal(tempo_t inicio);
         // sol_ptr localSearch();
 };
 
