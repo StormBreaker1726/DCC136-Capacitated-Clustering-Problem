@@ -24,12 +24,28 @@ struct Solution
         this->solution_cost = 0;
     };
 
+    double actual_cost() {
+        double cost = 0;
+        for (size_t i = 0; i < clusters.size(); i++)
+        {
+            cost += clusters.at(i)->cluster_cost;
+        }
+        return cost;
+    }
+
     void update_cost()
     {
         this->solution_cost = 0;
         for (size_t i = 0; i < clusters.size(); i++)
         {
-            this->solution_cost += clusters.at(i)->cluster_cost;
+            double cost = clusters.at(i)->cluster_cost;
+            if (this->clusters.at(i)->lower_bound > this->clusters.at(i)->current_bound) {
+                cost = cost - cost/4;
+            } else if (this->clusters.at(i)->upper_bound < this->clusters.at(i)->current_bound) {
+                cost = cost/2;
+            }
+
+            this->solution_cost += cost;
         }
     };
 
@@ -85,19 +101,9 @@ struct Solution
     bool solutionViable() {
         for (size_t i=0; i<this->clusters.size(); ++i) {
             if (this->clusters.at(i)->upper_bound < this->clusters.at(i)->current_bound) {
-                std::cerr << "Cluster: " << i << "\n";
-                std::cerr << "Bounds: [" << 
-                    this->clusters.at(i)->lower_bound << " - " <<
-                    this->clusters.at(i)->upper_bound << "]\n";
-                std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
                 return false;
             }
-            if (this->clusters.at(i)->lower_bound > this->clusters.at(i)->current_bound) {
-                std::cerr << "Cluster: " << i << "\n";
-                std::cerr << "Bounds: [" << 
-                    this->clusters.at(i)->lower_bound << " - " <<
-                    this->clusters.at(i)->upper_bound << "]\n";
-                std::cerr << "Current: " << this->clusters.at(i)->current_bound << "\n"; 
+            if (this->clusters.at(i)->lower_bound > this->clusters.at(i)->current_bound) { 
                 return false;
             }
         }

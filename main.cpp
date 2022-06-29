@@ -45,7 +45,9 @@ int main(int argc, char const *argv[])
     double delta = std::chrono::duration_cast<std::chrono::milliseconds>((end) - (start)).count();
     
     outputFile << "Seed: " << seed << "\n";
-    outputFile << "Qualidade: " << s->solution_cost << "\n";
+    outputFile << "Qualidade: " << s->actual_cost() << "\n";
+    outputFile << "Qualidade (Handicap): " << s->solution_cost << "\n";
+    outputFile << "Viabilidade: " << s->solutionViable() << "\n";
     outputFile << "Tempo de execução: " << delta << "\n\n";
     
     s->print_solution(outputFile);

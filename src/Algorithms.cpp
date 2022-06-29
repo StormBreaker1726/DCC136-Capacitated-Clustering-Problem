@@ -25,12 +25,44 @@ double Algorithms::penalization(node_ptr n1, node_ptr n2, size_t cluster_id) {
     double f2 = (nodes_weight) + cluster->current_bound;
     f2 = f2 / cluster->upper_bound;
     /* B*f1 + C*f2 => testar diferentes B e C */
-    return 1/4 * f1 + 5 * f2;
+    return 1/4 * f1 + this->g->getNumberNodes() * 10 * f2;
 }
 
 /* A = 2 (testar para diferentes valores) */
 double Algorithms::chance_calc(edge_ptr e, size_t cluster_id) {
     return 2*e->weight() + this->penalization(g->getNode(e->idNode1()), g->getNode(e->idNode2()), cluster_id);
+}
+
+void Algorithms::insert_edges_cluster(size_t c_id) {
+    size_t n = this->solution->clusters.at(c_id)->id_nodes.size();
+    for (size_t i=0; i<n-1 && i<this->solution->clusters.at(c_id)->id_nodes.size()-1; ++i) {
+        std::pair<int, int>* v_i = &this->solution->clusters.at(c_id)->id_nodes.at(i);
+        for (size_t j=i+1; j<n && j<this->solution->clusters.at(c_id)->id_nodes.size(); ++j) {
+            std::pair<int, int>* v_next = &this->solution->clusters.at(c_id)->id_nodes.at(j);
+            /* Se tiver aresta entre dois vértices*/
+            if (this->g->getNode(v_i->first)->edge_weight(v_next->first) > 0 
+                && v_i->first != v_next->second && v_i->second != v_next->first) {
+                //this->solution->solution_cost += this->g->getNode(v_i->first)->edge_weight(v_next->first);
+                this->solution->clusters.at(c_id)->cluster_cost += this->g->getNode(v_i->first)->edge_weight(v_next->first);
+                if (v_next->second == -1) {
+                    v_next->second = v_i->first;
+                } else if (v_i->second == -1) {
+                    v_i->second = v_next->first;
+                } else {
+                    this->solution->clusters.at(c_id)->id_nodes.push_back({v_i->first, v_next->first});
+                    v_i = &this->solution->clusters.at(c_id)->id_nodes.at(i);
+                }
+                if (v_i->second == -1) {
+                    this->solution->clusters.at(c_id)->id_nodes.erase(
+                        this->solution->clusters.at(c_id)->id_nodes.begin() + i
+                    );
+                    if (i>0) --i;
+                    if (j>0) --j;
+                }
+            }
+        }
+    }
+    this->solution->update_cost();
 }
 
 void Algorithms::insert_all_edges() {
@@ -415,12 +447,11 @@ sol_ptr Algorithms::greedy(float alpha, size_t it) {
             Solution s = *this->greedyFirstHelper(alpha);
             if (s.solution_cost > sBest.solution_cost) {
                     sBest = *s.clone();
+            }
         } else {
             Solution s = *this->greedyCheaperHelper(alpha);
             if (s.solution_cost > sBest.solution_cost) {
                     sBest = *s.clone();
-            }
-
             }
         }
     }
@@ -450,6 +481,7 @@ sol_ptr Algorithms::destruction(Solution& s, std::vector<int>& nodes) {
             std::vector<int> helper = s.clusters.at(id_pesa)->getNodes();
             nodes.insert(nodes.end(), helper.begin(), helper.end());
         } while (0);
+
         s.clusters.at(id_leve)->clearCluster();
         s.clusters.at(id_pesa)->clearCluster();
 
@@ -461,7 +493,8 @@ sol_ptr Algorithms::destruction(Solution& s, std::vector<int>& nodes) {
             if (s.clusters.at(i)->cluster_cost < s.clusters.at(bar1)->cluster_cost) {
                 bar2 = bar1;
                 bar1 = i;
-            } else if (s.clusters.at(i)->cluster_cost < s.clusters.at(bar2)->cluster_cost) {
+            } else if (s.clusters.at(i)->cluster_cost < s.clusters.at(bar2)->cluster_cost
+                && i != bar1) {
                 bar2 = i;
             }
         }
@@ -475,27 +508,121 @@ sol_ptr Algorithms::destruction(Solution& s, std::vector<int>& nodes) {
     } else {
     // 3: Escolher dois aleatórios
         do {
-            std::set<int> randomClusters;
-            for (size_t i=0; i<2; i++) {
-                randomClusters.insert(rand() % s.clusters.size());
-            }
-            nodes = s.clusters.at(*randomClusters.begin())->getNodes();
-            std::vector<int> vec_help = s.clusters.at(*randomClusters.begin()+1)->getNodes();
+            int c1 = rand() % s.clusters.size();
+            int c2 = -1;
+            do {
+                c2 = rand() % s.clusters.size();
+            } while (c2 == c1);
+
+            nodes = s.clusters.at(c1)->getNodes();
+            s.clusters.at(c1)->clearCluster();
+            std::vector<int> vec_help = s.clusters.at(c2)->getNodes();
             nodes.insert(nodes.end(), vec_help.begin(), vec_help.end());
-            s.clusters.at(*randomClusters.begin())->clearCluster();
-            s.clusters.at(*randomClusters.begin()+1)->clearCluster();
+            s.clusters.at(c2)->clearCluster();
         } while (0);
     } 
 
     return std::make_shared<Solution>(s);
 }
 
-sol_ptr Algorithms::construction(Solution& s, std::vector<int>& nodes) {
+sol_ptr Algorithms::construction(float alpha, Solution& s, std::vector<int>& nodes) {
     
     std::vector<Candidate_Node> cand_list;
     cand_list.reserve(nodes.size());
+    /* Iterar pelos vértices fora de algum dos 2 clusters; 
+        Ver qual é a melhor opção de inserção para ele. 
+        Ordenar os candidatos e escolher o N melhor */
     
-    return std::make_shared<Solution>(s);
+    // encontrar os dois clusters vazios
+    int c1 = -1;
+    int c2 = -1;
+    for (size_t i=0; i<s.clusters.size(); ++i) {
+        if (s.clusters.at(i)->id_nodes.empty()) {
+            if (c1 != -1) {
+                c2 = i;
+            } else {
+                c1 = i;
+            }
+        }
+    }
+    // inicializa os dois clusters com vértices aleatórios
+    do {
+        int n1 = rand() % nodes.size();
+        int n2 = -1;
+        do {
+            n2 = rand() % nodes.size();
+        } while (n2 == n1);
+        s.clusters.at(c1)->insertNode(this->g->getNode(*(nodes.begin() + n1)));
+        s.clusters.at(c2)->insertNode(this->g->getNode(*(nodes.begin() + n2)));
+
+        if (n1 > n2) {
+            nodes.erase(nodes.begin()+n1);
+            nodes.erase(nodes.begin()+n2);
+        } else {
+            nodes.erase(nodes.begin()+n2);
+            nodes.erase(nodes.begin()+n1);    
+        }
+    } while (0);
+    // inicializa a lista de candidatos
+    for (size_t i=0; i<nodes.size(); ++i) {
+        double pen1 = MAXFLOAT;
+        double pen2 = MAXFLOAT;
+        node_ptr node = this->g->getNode(nodes.at(i));
+        if (node->edge_weight(s.clusters.at(c1)->id_nodes.at(0).first) > 0) {
+            pen1 = this->penalization(node, nullptr, c1);
+        }
+        if (node->edge_weight(s.clusters.at(c2)->id_nodes.at(0).first) > 0) {
+            pen2 = this->penalization(node, nullptr, c2);
+        }
+        if (pen1 < pen2) {
+            Candidate_Node c_node(node->id(), pen1, c1);
+            cand_list.push_back(c_node);
+        } else {
+            Candidate_Node c_node(node->id(), pen2, c2);
+            cand_list.push_back(c_node);
+        }
+    }
+    nodes.clear();
+    while (!cand_list.empty()) {
+
+        for (size_t i=0; i<cand_list.size(); i++) {
+            double custo1 = 0;
+            double custo2 = 0;
+            node_ptr node = this->g->getNode(cand_list.at(i).node_id);
+            for (size_t j=0; j<s.clusters.at(c1)->id_nodes.size(); ++j) {
+                custo1 += node->edge_weight(s.clusters.at(c1)->id_nodes.at(j).first);
+            }
+            for (size_t j=0; j<s.clusters.at(c2)->id_nodes.size(); ++j) {
+                custo2 += node->edge_weight(s.clusters.at(c2)->id_nodes.at(j).first);
+            }
+            custo1 -= this->penalization(node, nullptr, c1);
+            custo2 -= this->penalization(node, nullptr, c2);
+            if (custo1 > custo2) {
+                cand_list.at(i).cluster_id = c1;
+                cand_list.at(i).penalization = custo1;
+            } else {
+                cand_list.at(i).cluster_id = c2;
+                cand_list.at(i).penalization = custo2;
+            }
+        }
+
+        std::sort(cand_list.begin(), cand_list.end(), 
+            [](Candidate_Node& a, Candidate_Node& b) {
+                return a.penalization > b.penalization;
+            });
+        /* Seleciona um candidato aleatório */
+        size_t nElmts = alpha * cand_list.size();
+        size_t cand_n = nElmts == 0 ? 0 : rand() % nElmts;
+        Candidate_Node c = cand_list.at(cand_n);
+
+        this->solution->insert_node_on_cluster(c.cluster_id, this->g->getNode(c.node_id));
+        cand_list.erase(cand_list.begin() + cand_n);
+    }
+
+    this->solution = std::make_shared<Solution>(s);
+    this->insert_edges_cluster(c1);
+    this->insert_edges_cluster(c2);
+    return this->solution;
 }
 
 sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it) {
@@ -512,18 +639,16 @@ sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it) {
         s = *this->destruction(s, nodes);
 
         /* REMONTA OS CLUSTERS */
-        s = *this->construction(s, nodes);
-
-        this->solution = std::make_shared<Solution>(s);
-        return this->solution;
-
-        if (s.solution_cost < sBest.solution_cost) {
+        s = *this->construction(alpha, s, nodes);
+        
+        if (s.solution_cost > sBest.solution_cost) {
             sBest = *s.clone();
+            no_improv = 0;
         } else {
             /* sem melhora */
             ++no_improv;
         }
-        if (no_improv > 20) {
+        if (no_improv > 50) {
             break;
         }
     }

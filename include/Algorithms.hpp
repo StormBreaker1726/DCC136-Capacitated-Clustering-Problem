@@ -73,12 +73,13 @@ class Algorithms
         double penalization(node_ptr n1, node_ptr n2, size_t cluster_id);
         double chance_calc(edge_ptr e, size_t cluster_id);
         void insert_all_edges();
+        void insert_edges_cluster(size_t c_id);
         sol_ptr greedyFirstHelper(float alpha);
         sol_ptr greedyCheaperHelper(float alpha);
         sol_ptr greedyNodesHelper(float alpha);
         //std::vector<Candidate_Edge> update_cand_list(std::vector<Candidate_Edge>& cand_list);
         sol_ptr destruction(Solution& s, std::vector<int>& nodes);
-        sol_ptr construction(Solution& s, std::vector<int>& nodes);
+        sol_ptr construction(float alpha, Solution& s, std::vector<int>& nodes);
     public:
         Algorithms(std::shared_ptr<Graph> g);
         sol_ptr greedy(float alpha, size_t it);
