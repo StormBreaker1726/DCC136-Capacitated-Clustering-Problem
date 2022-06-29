@@ -30,7 +30,7 @@ double Algorithms::penalization(node_ptr n1, node_ptr n2, size_t cluster_id) {
 
 /* A = 2 (testar para diferentes valores) */
 double Algorithms::chance_calc(edge_ptr e, size_t cluster_id) {
-    return 2*e->weight() + this->penalization(g->getNode(e->idNode1()), g->getNode(e->idNode2()), cluster_id);
+    return 2*e->weight() - this->penalization(g->getNode(e->idNode1()), g->getNode(e->idNode2()), cluster_id);
 }
 
 void Algorithms::insert_edges_cluster(size_t c_id) {
@@ -625,13 +625,14 @@ sol_ptr Algorithms::construction(float alpha, Solution& s, std::vector<int>& nod
     return this->solution;
 }
 
-sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it) {
+sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it, tempo_t inicio) {
     std::vector<int> nodes;
     nodes.reserve(this->g->getNumberNodes());
     
     Solution s = *this->greedy(alpha, it);
     Solution sBest = *s.clone();
 
+    std::cout << "\nSolução Inicial Gerada\n";
 
     size_t no_improv = 0;
     while (true) {
@@ -648,10 +649,85 @@ sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it) {
             /* sem melhora */
             ++no_improv;
         }
-        if (no_improv > 50) {
+        if (no_improv > 100) {
             break;
+        }
+        tempo_t agora = relogio_t::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>((agora) - (inicio)).count() > (long int) this->g->getNumberNodes()/4) {
+            std::cout << "\nIG Abortado por Tempo\n";
+            this->solution = std::make_shared<Solution>(sBest);
+            return this->solution;
         }
     }
     this->solution = std::make_shared<Solution>(sBest);
-    return this->solution;
+
+    std::cout << "\nIG Completo\n";
+    return this->buscaLocal(inicio);
+}
+
+sol_ptr Algorithms::buscaLocal(tempo_t inicio) {
+    Solution s = *this->solution;
+
+    size_t no_improv = 0;
+    while (true) {
+        // seleciona cluster
+        size_t id_c = rand() % s.clusters.size();
+        std::shared_ptr<Cluster> cluster = s.clusters.at(id_c);
+        
+        // seleciona vértice
+        std::vector<int> c_nodes = cluster->getNodes();
+        size_t it = rand() % c_nodes.size();
+        int id_n = *(c_nodes.begin() + it);
+        node_ptr node = this->g->getNode(id_n);
+
+
+        // calcula impacto no cluster atual
+        if (cluster->current_bound - node->weight() >= cluster->lower_bound) {
+            double impact = 0;
+            for (size_t i=0; i<c_nodes.size(); ++i) {
+                impact += node->edge_weight(c_nodes.at(i));
+            }
+
+            // calcula impacto nos outros clusters e insere no primeiro
+            // que melhorar
+            double new_impact = 0;
+            for (size_t i=0; i<s.clusters.size(); ++i) {
+                if ((i != id_c) && (node->weight() + s.clusters.at(i)->current_bound <= s.clusters.at(i)->upper_bound)) {
+                    std::vector<int> aux_nodes = s.clusters.at(i)->getNodes();
+                    for (size_t j=0; j<aux_nodes.size(); ++j) {
+                        new_impact += node->edge_weight(aux_nodes.at(j));
+                    }
+
+                    if (new_impact > impact) {
+                        c_nodes.erase(c_nodes.begin() + it);
+                        cluster->clearCluster();
+                        s.clusters.at(i)->clearCluster();
+                        aux_nodes.push_back(node->id());
+                        for (size_t k=0; k<c_nodes.size(); k++) {
+                            cluster->insertNode(this->g->getNode(c_nodes.at(k)));
+                        }
+
+                        for (size_t k=0; k<aux_nodes.size(); k++) {
+                            s.clusters.at(i)->insertNode(this->g->getNode(aux_nodes.at(k)));
+                        }
+                        this->insert_edges_cluster(i);
+                        this->insert_edges_cluster(id_c);
+                        no_improv = 0;
+                        break;
+                    }
+                }
+            }
+            no_improv++;
+        }
+        tempo_t agora = relogio_t::now();
+        if (no_improv > 1000 || 
+        std::chrono::duration_cast<std::chrono::seconds>((agora) - (inicio)).count() > (long int) this->g->getNumberNodes()/4) {
+            break;
+        }
+    }
+
+
+
+    this->solution = std::make_shared<Solution>(s);
+    return this->solution; 
 }
