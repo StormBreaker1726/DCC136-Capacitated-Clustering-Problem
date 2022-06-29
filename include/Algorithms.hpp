@@ -74,6 +74,8 @@ class Algorithms
         double chance_calc(edge_ptr e, size_t cluster_id);
         void insert_all_edges();
         void insert_edges_cluster(size_t c_id);
+        void insert_all_edges2();
+        void insert_edges_cluster2(size_t c_id);
         sol_ptr greedyFirstHelper(float alpha);
         sol_ptr greedyCheaperHelper(float alpha);
         sol_ptr greedyNodesHelper(float alpha);

@@ -65,6 +65,8 @@ void Algorithms::insert_edges_cluster(size_t c_id) {
     this->solution->update_cost();
 }
 
+
+
 void Algorithms::insert_all_edges() {
     for (size_t c_id=0; c_id<this->solution->clusters.size(); ++c_id) {
         size_t n = this->solution->clusters.at(c_id)->id_nodes.size();
@@ -95,6 +97,26 @@ void Algorithms::insert_all_edges() {
                 }
             }
         }
+    }
+    this->solution->update_cost();
+}
+
+void Algorithms::insert_edges_cluster2(size_t c_id) {
+    std::vector<int> nodes = this->solution->clusters.at(c_id)->getNodes();
+    double cost = 0;
+    for (size_t i=0; i<nodes.size(); ++i) {
+        node_ptr node = this->g->getNode(nodes.at(i));
+        for (size_t j=i; j<nodes.size(); ++j) {
+            cost += node->edge_weight(nodes.at(j));
+        }
+    }
+    this->solution->clusters.at(c_id)->cluster_cost += cost;
+    this->solution->update_cost();
+}
+
+void Algorithms::insert_all_edges2() {
+    for (size_t i=0; i<this->solution->clusters.size(); ++i) {
+        this->insert_edges_cluster2(i);
     }
     this->solution->update_cost();
 }
@@ -350,7 +372,7 @@ sol_ptr Algorithms::greedyCheaperHelper(float alpha)
             --i;
         }
     }
-    this->insert_all_edges();
+    this->insert_all_edges2();
     return this->solution;
 }
 
@@ -404,7 +426,7 @@ sol_ptr Algorithms::greedyNodesHelper(float alpha) {
         }
     }
     /* Cria as arestas */
-    this->insert_all_edges();
+    this->insert_all_edges2();
     return this->solution;
 }
 
@@ -620,8 +642,8 @@ sol_ptr Algorithms::construction(float alpha, Solution& s, std::vector<int>& nod
     }
 
     this->solution = std::make_shared<Solution>(s);
-    this->insert_edges_cluster(c1);
-    this->insert_edges_cluster(c2);
+    this->insert_edges_cluster2(c1);
+    this->insert_edges_cluster2(c2);
     return this->solution;
 }
 
@@ -649,7 +671,7 @@ sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it, tempo_t inicio) {
             /* sem melhora */
             ++no_improv;
         }
-        if (no_improv > 100) {
+        if (no_improv > this->g->getNumberNodes()*100) {
             break;
         }
         tempo_t agora = relogio_t::now();
@@ -710,8 +732,8 @@ sol_ptr Algorithms::buscaLocal(tempo_t inicio) {
                         for (size_t k=0; k<aux_nodes.size(); k++) {
                             s.clusters.at(i)->insertNode(this->g->getNode(aux_nodes.at(k)));
                         }
-                        this->insert_edges_cluster(i);
-                        this->insert_edges_cluster(id_c);
+                        this->insert_edges_cluster2(i);
+                        this->insert_edges_cluster2(id_c);
                         no_improv = 0;
                         break;
                     }

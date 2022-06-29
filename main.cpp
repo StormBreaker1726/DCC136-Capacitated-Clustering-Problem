@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
 
     long seed = time(NULL)*time(NULL)/rand();
     srand(seed);
-
+    //seed = 1520833600;
     std::ifstream inputFile;
     OPEN_FILE(inputFile, argv[1]);
     std::ofstream outputFile;
@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
     std::shared_ptr<Algorithms> a(new Algorithms(read(inputFile, handover)));
 
     tempo_t start = relogio_t::now();
-    std::shared_ptr<Solution> s(a->iteratedGreedy(alpha, 50, start));
+    std::shared_ptr<Solution> s(a->iteratedGreedy(alpha, 75, start));
     tempo_t end = relogio_t::now();
     double delta = std::chrono::duration_cast<std::chrono::milliseconds>((end) - (start)).count();
     
