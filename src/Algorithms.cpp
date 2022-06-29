@@ -671,7 +671,7 @@ sol_ptr Algorithms::iteratedGreedy(float alpha, size_t it, tempo_t inicio) {
             /* sem melhora */
             ++no_improv;
         }
-        if (no_improv > this->g->getNumberNodes()*100 || no_improv > 800) {
+        if (no_improv > this->g->getNumberNodes()*100 || no_improv > 1200) {
             break;
         }
         tempo_t agora = relogio_t::now();
