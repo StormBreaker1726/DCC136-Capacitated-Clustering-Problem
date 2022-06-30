@@ -9,4 +9,4 @@ debug: main.cpp ./src/*
 	$(CXX) $(CFLAGS) -g -o $@ $^
 
 clean:
-	rm -f main debug
+	rm -f main debug vertices.txt saida.txt
