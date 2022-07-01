@@ -2,6 +2,8 @@
 
 Trabalho de Clusterização Capacitada para a Disciplina DCC136 - Inteligência Computacional UFJF
 
+João Víctor Costa de Oliveira
+Marcelo Ian Rezende Menezes
 ## Como executar:
 
 ### Opção 1: Pelo exec.sh

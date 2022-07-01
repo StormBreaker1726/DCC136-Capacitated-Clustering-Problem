@@ -388,7 +388,7 @@ sol_ptr Algorithms::greedyNodesHelper(float alpha) {
         double bestPen = MAXFLOAT;
         size_t c_id = 0;
         for (size_t j=0; j<this->g->getNumberClusters(); ++j) {
-            if (bestPen < this->penalization(this->g->getNodeVector().at(i), nullptr, j)) {
+            if (bestPen > this->penalization(this->g->getNodeVector().at(i), nullptr, j)) {
                 bestPen = this->penalization(this->g->getNodeVector().at(i), nullptr, j);
                 c_id = j;
             }
@@ -712,8 +712,8 @@ sol_ptr Algorithms::buscaLocal(tempo_t inicio) {
 
             // calcula impacto nos outros clusters e insere no primeiro
             // que melhorar
-            double new_impact = 0;
             for (size_t i=0; i<s.clusters.size(); ++i) {
+                double new_impact = 0;
                 if ((i != id_c) && (node->weight() + s.clusters.at(i)->current_bound <= s.clusters.at(i)->upper_bound)) {
                     std::vector<int> aux_nodes = s.clusters.at(i)->getNodes();
                     for (size_t j=0; j<aux_nodes.size(); ++j) {
